@@ -10,7 +10,7 @@ if menu_selection == "HOME":
     home.show()
 elif menu_selection == "갤러리":
     gallery.show()
-elif menu_selection == "인물 관계도":
+elif menu_selection == "전체 인물 관계도":
     graph.show()
 elif menu_selection == "마니또":
     manito.show()

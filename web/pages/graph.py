@@ -9,7 +9,7 @@ font_path = "/System/Library/Fonts/AppleSDGothicNeo.ttc"  # macOS의 다른 한�
 font_prop = fm.FontProperties(fname=font_path)
 
 # 데이터 로드
-df = pd.read_csv('/Users/chaewon/Desktop/snukdt/시각화웹개발/project/exdata.csv')
+df = pd.read_csv('labeled_data.csv')
 df['timestamp'] = pd.to_datetime(df['timestamp'])
 
 def show():
@@ -35,7 +35,7 @@ def show():
     # 현재 시간에 해당하는 이미지들을 Streamlit에 표시
     st.subheader('사용된 이미지')
     for img_file in current_image_filenames:
-        img_path = os.path.join('/Users/chaewon/Desktop/snukdt/시각화웹개발/project/image', img_file)
+        img_path = os.path.join('image', img_file)
         if os.path.exists(img_path):
             st.image(img_path, caption=img_file, use_column_width=True)
 

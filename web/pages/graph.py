@@ -46,3 +46,7 @@ def show():
         neighbors = sorted(G[selected_node].items(), key=lambda x: x[1]['weight'], reverse=True)[:3]
         for neighbor, attr in neighbors:
             st.write(f"{neighbor} (연결 횟수: {attr['weight']})")
+
+# 이 함수는 페이지를 실행할 때 호출됩니다.
+if __name__ == "__main__":
+    show()

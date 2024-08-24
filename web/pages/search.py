@@ -114,3 +114,7 @@ def show():
 
     # Streamlit에 Sankey 다이어그램 표시
     st.plotly_chart(fig)
+
+# 이 함수는 페이지를 실행할 때 호출됩니다.
+if __name__ == "__main__":
+    show()

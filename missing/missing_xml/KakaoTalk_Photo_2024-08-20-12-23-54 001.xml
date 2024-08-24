@@ -1,0 +1,50 @@
+<annotation>
+	<folder>missing</folder>
+	<filename>KakaoTalk_Photo_2024-08-20-12-23-54 001.jpeg</filename>
+	<path>/Users/chaewon/Desktop/snukdt/시각화웹개발/project/Visualization/missing/KakaoTalk_Photo_2024-08-20-12-23-54 001.jpeg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>4032</width>
+		<height>3024</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>김병현</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>1574</xmin>
+			<ymin>1428</ymin>
+			<xmax>1996</xmax>
+			<ymax>1917</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>황현범</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>2291</xmin>
+			<ymin>1456</ymin>
+			<xmax>2852</xmax>
+			<ymax>2028</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>강수민</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>2918</xmin>
+			<ymin>1061</ymin>
+			<xmax>3646</xmax>
+			<ymax>1884</ymax>
+		</bndbox>
+	</object>
+</annotation>

@@ -1,5 +1,5 @@
 import streamlit as st
-from pages import home, schedule, gallery, graph, manito, search
+from pages import home, schedule, gallery, graph, manito_hi, search
 
 # Streamlit 사이드바 메뉴
 st.sidebar.title("메뉴")
@@ -15,7 +15,7 @@ elif menu_selection == "갤러리":
 elif menu_selection == "전체 인물 관계도":
     graph.show()
 elif menu_selection == "마니또":
-    manito.show()
-elif menu_selection == "인물 검색":
+    manito_hi.show()
+elif menu_selection == "인물 검색": 
     search.show()
 

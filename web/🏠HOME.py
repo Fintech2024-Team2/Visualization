@@ -1,6 +1,7 @@
 import streamlit as st
 from PIL import Image
 
+
 def show():
     # 사이드바 설정
     st.sidebar.title("About")

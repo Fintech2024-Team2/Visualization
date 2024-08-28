@@ -1,8 +1,14 @@
 import streamlit as st
 import pandas as pd
+import os
+from PIL import Image
 
-def show():
-    st.title("워크숍 주요 일정")
+# Helper function to load images
+def load_image(image_path):
+    return Image.open(image_path)
+
+def show_timeline_with_gallery():
+    st.title("워크숍 타임라인 및 갤러리")
 
     # 주요 일정 데이터
     schedule_data = {
@@ -22,18 +28,39 @@ def show():
             "강의 시작(이재욱 교수님 특강)", 
             "오대산 도착 및 등산",
             "점심식사"
+        ],
+        "사진폴더": [
+            "버스", "점심", "교육", "체육대회", "술자리", 
+            None, "강의", "오대산", "점심식사"
         ]
     }
 
     df_schedule = pd.DataFrame(schedule_data)
 
-    # Streamlit에서 일정 표시
-    for date in df_schedule['날짜'].unique():
-        st.subheader(f"{date}")
-        day_schedule = df_schedule[df_schedule['날짜'] == date]
-        for index, row in day_schedule.iterrows():
-            st.markdown(f"**{row['시간']}** - {row['일정']}")
+    # 일정과 갤러리 표시
+    for _, row in df_schedule.iterrows():
+        st.subheader(f"{row['날짜']} {row['시간']} - {row['일정']}")
 
-# 이 함수는 페이지를 실행할 때 호출됩니다.
+        # 사진 폴더가 있을 때만 갤러리 표시
+        if row['사진폴더']:
+            st.write(f"{row['일정']} 관련 사진들:")
+            image_dir = f"사진첩구현/{row['사진폴더']}"
+            
+            if os.path.exists(image_dir):
+                photo_files = [f for f in os.listdir(image_dir) if f.endswith(('.JPG', '.PNG', '.jpg', '.png', '.jpeg'))]
+
+                if photo_files:
+                    cols = st.columns(3)
+                    for i, img_file in enumerate(photo_files):
+                        img = load_image(os.path.join(image_dir, img_file))
+                        with cols[i % 3]:
+                            st.image(img, use_column_width=True)
+                else:
+                    st.write("사진이 없습니다.")
+            else:
+                st.write("이미지 폴더가 존재하지 않습니다.")
+        else:
+            st.write("관련 사진 없음.")
+
 if __name__ == "__main__":
-    show()
+    show_timeline_with_gallery()

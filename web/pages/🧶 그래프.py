@@ -1,20 +1,74 @@
-from utils.graph_utils import create_graph, plot_graph, add_image_to_node
-import matplotlib.font_manager as fm
-import pandas as pd
 import streamlit as st
+import pandas as pd
 import os
-
-# 한글 폰트 설정
-font_path = "/System/Library/Fonts/AppleSDGothicNeo.ttc"  # macOS의 다른 한글 폰트 경로
-font_prop = fm.FontProperties(fname=font_path)
+import networkx as nx
+import plotly.graph_objs as go
+from utils.graph_utils import create_graph
 
 # 데이터 로드
-df = pd.read_csv('labeled_data.csv')
+df = pd.read_csv('finaldata.csv')
 df['timestamp'] = pd.to_datetime(df['timestamp'])
+
+def plot_graph_plotly(G, pos, node_data):
+    edge_traces = []
+    for edge in G.edges(data=True):
+        x0, y0 = pos[edge[0]]
+        x1, y1 = pos[edge[1]]
+        
+        edge_trace = go.Scatter(
+            x=[x0, x1, None], y=[y0, y1, None],
+            line=dict(width=edge[2]['weight'], color='#888'),  # 엣지의 굵기를 개별적으로 설정
+            hoverinfo='none',
+            mode='lines'
+        )
+        edge_traces.append(edge_trace)
+
+    node_x = []
+    node_y = []
+    node_color = []
+    node_text = []
+
+    for node in G.nodes():
+        x, y = pos[node]
+        node_x.append(x)
+        node_y.append(y)
+        node_color.append('lightblue')  # 노드 색상 설정
+        node_name = node[1:]  # 첫 글자를 제외한 이름으로 설정
+        node_text.append(node_name)
+
+    node_trace = go.Scatter(
+        x=node_x, y=node_y,
+        mode='markers+text',
+        hoverinfo='text',
+        marker=dict(
+            showscale=False,
+            color=node_color,
+            size=20,  # 노드 크기 고정
+            line=dict(width=2, color='DarkSlateGrey')
+        ),
+        text=node_text,
+        textposition="middle center"  # 텍스트 위치를 노드 중앙에 설정
+    )
+
+    fig = go.Figure(data=edge_traces + [node_trace],
+                    layout=go.Layout(
+                        title='워크샵 인물 관계 그래프',
+                        titlefont_size=16,
+                        showlegend=False,
+                        hovermode='closest',
+                        margin=dict(b=0,l=0,r=0,t=0),
+                        annotations=[dict(
+                            text="",
+                            showarrow=False,
+                            xref="paper", yref="paper"
+                        )],
+                        xaxis=dict(showgrid=False, zeroline=False),
+                        yaxis=dict(showgrid=False, zeroline=False))
+                    )
+    return fig
 
 def show():
     st.title("9기의 워크샵 인물 관계 그래프 시각화")
-    st.write("아직 제가 갖고 있는 사진 6장만 쓴 상태입니다!")
 
     time_point = st.slider(
         '시간 선택',
@@ -25,19 +79,9 @@ def show():
     )
 
     G, pos, sub_df = create_graph(time_point, df)
-    fig = plot_graph(G, pos, sub_df, font_prop)  # 여기에 font_prop 추가
+    fig = plot_graph_plotly(G, pos, sub_df)
 
-    st.pyplot(fig)
-
-# 현재 시간과 일치하는 이미지 파일명 가져오기
-    current_image_filenames = df[df['timestamp'] == time_point]['filename'].unique()
-
-    # 현재 시간에 해당하는 이미지들을 Streamlit에 표시
-    st.subheader('사용된 이미지')
-    for img_file in current_image_filenames:
-        img_path = os.path.join('image', img_file)
-        if os.path.exists(img_path):
-            st.image(img_path, caption=img_file, use_column_width=True)
+    st.plotly_chart(fig)
 
     # 노드 선택 기능
     selected_node = st.selectbox('인물을 선택하세요', options=list(G.nodes))
@@ -47,6 +91,5 @@ def show():
         for neighbor, attr in neighbors:
             st.write(f"{neighbor} (연결 횟수: {attr['weight']})")
 
-# 이 함수는 페이지를 실행할 때 호출됩니다.
 if __name__ == "__main__":
     show()

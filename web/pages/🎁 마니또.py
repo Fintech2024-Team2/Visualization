@@ -1,62 +1,48 @@
-import pandas as pd
 import streamlit as st
-from pyvis.network import Network
-from streamlit.components.v1 import html
+from streamlit_agraph import Config, Node, Edge, agraph
+import pandas as pd
 
-# Function to create the network graph
-def create_network_graph():
-    df = pd.read_csv('/Users/chaewon/Desktop/manito.csv')
-    net = Network(
-        notebook=False,   # Set to False for Streamlit compatibility
-        directed=True,    # Directed graph
-        height="800px",   # Adjust height as needed
-        width="100%"      # Fill the entire width
-    )
-    net.barnes_hut(gravity=-30000, central_gravity=0.3, spring_length=100, spring_strength=0.01, damping=0.09, overlap=0)
-    
-    sources = df['from']
-    targets = df['to']
-    weights = df['power']
-    
-    edge_data = zip(sources, targets, weights)
-    
-    for e in edge_data:
-        src = e[0]
-        dst = e[1]
-        w = e[2]
+# 데이터 로드
+df = pd.read_csv('/Users/chaewon/Desktop/manito.csv')
 
-        net.add_node(src, src, title=src, size=25)
-        net.add_node(dst, dst, title=dst, size=25)
-        net.add_edge(src, dst, value=w, title=w, arrows="to")
+# Streamlit App
+st.title("마니또 관계 시각화 with AGraph")
 
-    # Customize edge colors based on weight values
-    for n in net.edges:
-        if n["value"] == '음료':
-            n['color'] = 'blue'
-        elif n["value"] == '과자':
-            n['color'] = 'green'
-        elif n["value"] == '응원':
-            n['color'] = 'red'
-        else:
-            n['color'] = 'black'
-    
-    net.show_buttons(filter_=['physics'])
-    return net
+# AGraph Nodes and Edges
+nodes = {}
+edges = []
 
-# Streamlit app
-def show():
-    st.title("마니또")
-    st.write("당신의 마니또를 검색하세요!")
-    
-    # Create and display the network graph
-    net = create_network_graph()
-    net.save_graph('pyvis_net_graph.html')
-    
-    # Embed the graph in the Streamlit app
-    html_file = open('pyvis_net_graph.html', 'r', encoding='utf-8')
-    source_code = html_file.read()
-    html_file.close()
-    html(source_code, height=800)
+for _, row in df.iterrows():
+    # 노드 이름을 두 글자로 줄이기 (첫 두 글자를 사용)
+    from_name = row['from'][1:]
+    to_name = row['to'][1:]
 
-if __name__ == '__main__':
-    show()
+    # 노드 추가 (중복 방지)
+    if from_name not in nodes:
+        nodes[from_name] = Node(id=from_name, label=from_name, size=40, shape="circle", font={"size": 20})
+    if to_name not in nodes:
+        nodes[to_name] = Node(id=to_name, label=to_name, size=40, shape="circle", font={"size": 20})
+    
+    # 엣지 추가 (클릭 시 표시될 툴팁 내용 설정)
+    description_text = f"{row['from']} -> {row['to']} : {row['description']}"
+    edges.append(Edge(source=from_name, target=to_name, label="", title=description_text, font={"size": 12}))
+
+# AGraph 구성
+config = Config(
+    width=1000, 
+    height=800, 
+    directed=True,
+    nodeHighlightBehavior=True, 
+    highlightColor="#F7A7A6", 
+    collapsible=False, 
+    node={'labelProperty': 'label'},
+    link={'labelProperty': 'title', 'renderLabel': False},
+    **{
+        "linkTitleBehavior": "onClick",  # 엣지를 클릭할 때만 툴팁이 나타나도록 설정
+    },
+    staticGraphWithDragAndDrop=True,  # 레이아웃 고정
+    staticGraph=True  # 그래프를 움직이지 않도록 고정
+)
+
+# 그래프 그리기
+agraph(nodes=list(nodes.values()), edges=edges, config=config)

@@ -11,8 +11,8 @@ def create_full_network_graph(df):
     for idx, row in df.iterrows():
         src = row['from']
         dst = row['to']
-        power_category = row['power']
-        G.add_edge(src, dst, category=power_category)
+        description = row['description']
+        G.add_edge(src, dst, description=description)
     pos = nx.spring_layout(G, seed=42)  # Fix the seed for consistent layout
     return G, pos
 
@@ -24,34 +24,27 @@ def create_subgraph(G, df, end_index):
 
 # Function to plot the graph using Plotly
 def plot_graph(G, pos):
-    # Create edge traces for each category
+    # Create edge traces for each edge
     edge_traces = []
-    category_colors = {
-        '음료': 'red',
-        '응원': 'blue',
-        '물건': 'green',
-    }
-
     for edge in G.edges(data=True):
         src, dst, data = edge
         x0, y0 = pos[src]
         x1, y1 = pos[dst]
-        color = category_colors.get(data['category'], 'gray')
 
         edge_trace = go.Scatter(
             x=[x0, x1],
             y=[y0, y1],
-            line=dict(width=2, color=color),
-            hoverinfo='text',
-            text=f"{src} → {dst} ({data['category']})",
+            line=dict(width=2, color='gray'),
+            hoverinfo='none',
             mode='lines'
         )
         edge_traces.append(edge_trace)
 
-    # Create node trace
+    # Create node traces with hover text
     node_x = [pos[node][0] for node in G.nodes()]
     node_y = [pos[node][1] for node in G.nodes()]
-    node_text = [node for node in G.nodes()]
+    node_hover_text = [f"<b>{node}</b><br>{G.nodes[node]['description']}" if 'description' in G.nodes[node] else f"<b>{node}</b>" for node in G.nodes()]
+    node_text = [node for node in G.nodes()]  # 노드 이름만 표시
 
     node_trace = go.Scatter(
         x=node_x,
@@ -60,10 +53,16 @@ def plot_graph(G, pos):
         mode='markers+text',
         textposition="top center",
         hoverinfo='text',
+        hovertext=node_hover_text,
         marker=dict(
             size=20,
-            color='lightskyblue',
+            color='lightblue',
             line=dict(width=2, color='DarkSlateGrey')
+        ),
+        hoverlabel=dict(
+            bgcolor="white",  # 말풍선 배경색
+            font_size=16,  # 말풍선 글씨 크기
+            font_family="Arial"  # 말풍선 글씨체
         )
     )
 
@@ -105,21 +104,14 @@ def show():
     max_index = len(df) - 1
     current_index = st.slider("순서", 0, max_index + 1, 0, help="슬라이더를 움직여 시간에 따른 변화를 확인하세요.")
     
-    # Display images at specific timestamps
-    if current_index == 0:
-        st.image('/Users/chaewon/Downloads/IMG_2947.JPG', use_column_width=True)
-    elif current_index == 10:
-        placeholder = st.empty()
-        image_path2 = '/Users/chaewon/Downloads/IMG_2948.JPG'  # 두 번째 이미지 경로
-        img2 = Image.open(image_path2)
-        placeholder.image(img2, use_column_width=True)
-        time.sleep(0.5)  # 이미지가 0.5초 동안 표시됨
-        placeholder.empty()  # 이미지를 제거
-    
     # If current_index is 0, do not show the graph and data
     if current_index > 0:
         # Create subgraph based on current index
         G_sub = create_subgraph(full_G, df, current_index - 1)
+        
+        # Add node descriptions to G_sub
+        for node in G_sub.nodes():
+            G_sub.nodes[node]['description'] = df[df['from'] == node]['description'].values[0] if not df[df['from'] == node].empty else ""
         
         # Plot graph
         fig = plot_graph(G_sub, pos)

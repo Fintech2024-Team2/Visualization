@@ -14,10 +14,8 @@ def show():
 
     # 메인 페이지 내용
     st.title("🎈 Workshop Visualization Project")
-    st.write("""
-    환영합니다! 이 페이지는 워크숍에서 찍은 사진을 바탕으로 인물 간의 관계를 시각화한 프로젝트의 홈 화면입니다. 
-    사이드바를 통해 원하는 메뉴를 선택할 수 있습니다. 
-    """)
+    st.write("""안녕하세요! 저희는 워크숍 사진을 기반으로 인물 간 네트워크 시각화 프로젝트를 진행한 2조입니다.""")
+    st.write("""사이드바를 통해 원하시는 메뉴를 선택해주세요!""")
 
     # 메인 페이지 이미지 로드 및 표시
     image_path = "/Users/chaewon/Desktop/snukdt/시각화웹개발/project/Visualization/사진첩구현/체육대회/KakaoTalk_20240814_체육대회단체.jpg"

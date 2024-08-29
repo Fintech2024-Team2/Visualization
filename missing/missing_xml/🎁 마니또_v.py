@@ -6,7 +6,7 @@ import pandas as pd
 df = pd.read_csv('/Users/chaewon/Desktop/manito.csv')
 
 # Streamlit App
-st.title("마니또 관계 시각화 with AGraph")
+st.title("마니또 관계 시각화")
 
 # AGraph Nodes and Edges
 nodes = {}
